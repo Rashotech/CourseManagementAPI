@@ -1,6 +1,8 @@
 using System.Text;
+using CourseManagement.Config;
 using CourseManagement.Database;
 using CourseManagement.Database.Models;
+using CourseManagement.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +23,11 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod();
         });
 });
+
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
+builder.Services.AddAutoMapper(typeof(MappingConfig));
 
 var jwtSecret = builder.Configuration["JWT:Secret"] ?? throw new InvalidOperationException("JWT Secret not found.");
 builder.Services.AddAuthentication(options =>
@@ -90,7 +97,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseAuthentication()
+app.UseExceptionHandler()
+   .UseAuthentication()
    .UseAuthorization();
 
 app.MapControllers();
