@@ -67,7 +67,7 @@ namespace CourseManagement.Helpers
             {
                 ArgumentOutOfRangeException => (StatusCodes.Status400BadRequest, "Invalid argument provided."),
                 KeyNotFoundException _ => (StatusCodes.Status404NotFound, "Resource not found."),
-                BadRequestException _ => (StatusCodes.Status404NotFound, "Bad Request."),
+                BadRequestException _ => (StatusCodes.Status400BadRequest, "Bad Request."),
                 NotFoundException _ => (StatusCodes.Status404NotFound, "Resource not found."),
                 _ => (StatusCodes.Status500InternalServerError, "An unexpected error occurred.")
             };
