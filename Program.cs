@@ -3,6 +3,8 @@ using CourseManagement.Config;
 using CourseManagement.Database;
 using CourseManagement.Database.Models;
 using CourseManagement.Helpers;
+using CourseManagement.Repositories;
+using CourseManagement.Repositories.Interfaces;
 using CourseManagement.Services;
 using CourseManagement.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -54,6 +56,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options
     .UseSqlServer(connectionString)
     .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
 );
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddIdentityCore<ApplicationUser>()
     .AddRoles<IdentityRole>()
