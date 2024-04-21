@@ -15,7 +15,7 @@ namespace CourseManagement.Database.Models
         public required string InstructorId { get; set; }
         
         [ForeignKey("InstructorId")]
-        public required ApplicationUser Instructor { get; set; }
+        public ApplicationUser Instructor { get; set; }
 
         [Required]
         [DataType(DataType.Date)]

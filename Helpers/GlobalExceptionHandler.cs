@@ -69,6 +69,7 @@ namespace CourseManagement.Helpers
                 KeyNotFoundException _ => (StatusCodes.Status404NotFound, "Resource not found."),
                 BadRequestException _ => (StatusCodes.Status400BadRequest, "Bad Request."),
                 NotFoundException _ => (StatusCodes.Status404NotFound, "Resource not found."),
+                UnauthorizedAccessException _ => (StatusCodes.Status401Unauthorized, "Unauthorized."),
                 _ => (StatusCodes.Status500InternalServerError, "An unexpected error occurred.")
             };
         }

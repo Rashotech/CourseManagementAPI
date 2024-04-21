@@ -22,10 +22,10 @@ namespace CourseManagement.Controllers
         [HttpPost("Register")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<APIResponse>> Register([FromBody] RegisterUserRequestDto registerUserRequestDto)
+        public async Task<ActionResult<APIResponse<UserAuthResponseDto>>> Register([FromBody] RegisterUserRequestDto registerUserRequestDto)
         {
             var user = await _authService.RegisterAsync(registerUserRequestDto);
-            return CreatedAtAction(nameof(Login), null, new APIResponse
+            return CreatedAtAction(nameof(Login), null, new APIResponse<UserAuthResponseDto>
             {
                 StatusCode = HttpStatusCode.Created,
                 Message = "User registered successfully",
@@ -36,10 +36,10 @@ namespace CourseManagement.Controllers
         [HttpPost("Login")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<APIResponse>> Login([FromBody] LoginUserRequestDto loginUserDto)
+        public async Task<ActionResult<APIResponse<UserAuthResponseDto>>> Login([FromBody] LoginUserRequestDto loginUserDto)
         {
             var user = await _authService.LoginAsync(loginUserDto);
-            return new APIResponse { Data = user, Message = "Login Successful" };
+            return new APIResponse<UserAuthResponseDto> { Data = user, Message = "Login Successful" };
         }
     }
 }
