@@ -3,6 +3,8 @@ using CourseManagement.Config;
 using CourseManagement.Database;
 using CourseManagement.Database.Models;
 using CourseManagement.Helpers;
+using CourseManagement.Services;
+using CourseManagement.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -57,6 +59,8 @@ builder.Services.AddIdentityCore<ApplicationUser>()
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
+builder.Services.AddScoped<IAuthService, AuthService>();
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(opt =>
@@ -89,6 +93,12 @@ builder.Services.AddSwaggerGen(opt =>
 });
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    await Seeder.InitializeAsync(services);
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

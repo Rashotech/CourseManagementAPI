@@ -9,7 +9,7 @@ namespace CourseManagement.Config
         public MappingConfig()
 		{
             CreateMap<ApplicationUser, UserDto>().ReverseMap();
-            CreateMap<ApplicationUser, LoginUserResponseDto>().ReverseMap();
+            CreateMap<ApplicationUser, UserAuthResponseDto>().ReverseMap();
         }
     }
 }
