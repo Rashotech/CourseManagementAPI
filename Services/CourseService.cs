@@ -25,28 +25,23 @@ namespace CourseManagement.Services
             _mapper = mapper;
         }
 
-        public async Task<Course> AddCourseAsync(CourseRequestDto courseRequestDto, string InstructorId)
+        public async Task<Guid> AddCourseAsync(CourseRequestDto courseRequestDto, string InstructorId)
         {
             await ValidateCourseRequestAsync(courseRequestDto);
-            var course = new Course
-            {
-                CourseName = courseRequestDto.CourseName,
-                Description = courseRequestDto.Description,
-                InstructorId = InstructorId,
-                StartDate = courseRequestDto.StartDate,
-                EndDate = courseRequestDto.EndDate
-            };
+
+            var course = _mapper.Map<Course>(courseRequestDto);
+            course.InstructorId = InstructorId;
 
             await _unitOfWork.Courses.Add(course);
             await _unitOfWork.CommitAsync();
 
-            return course;
+            return course.Id;
         }
 
         public async Task DeleteCourseAsync(Guid CourseId, string InstructorId)
         {
             var course = await _unitOfWork.Courses.GetByIdAsync(CourseId);
-            if(course.InstructorId != InstructorId)
+            if (course.InstructorId != InstructorId)
                 throw new UnauthorizedAccessException("You are not authorized to delete this course");
 
             await _unitOfWork.Courses.Delete(CourseId);
@@ -57,7 +52,7 @@ namespace CourseManagement.Services
         {
             await ValidateCourseRequestAsync(courseRequestDto);
             var course = await _unitOfWork.Courses.GetByIdAsync(CourseId);
-            if(course.InstructorId != InstructorId)
+            if (course.InstructorId != InstructorId)
                 throw new UnauthorizedAccessException("You are not authorized to edit this course");
 
             _mapper.Map(courseRequestDto, course);
@@ -65,20 +60,25 @@ namespace CourseManagement.Services
             await _unitOfWork.CommitAsync();
         }
 
-        public Task GetAllCoursesAsync()
+        public async Task<List<CourseReponseDto>> GetAllCoursesAsync()
         {
-            throw new NotImplementedException();
+            var courses = await _unitOfWork.Courses.GetAllCoursesAsync();
+            var result = _mapper.Map<List<CourseReponseDto>>(courses);
+            return result;
         }
 
-        public Task GetCoursesByInstructorAsync(string InstructorId)
+        public async Task<List<CourseReponseDto>> GetCoursesByInstructorAsync(string InstructorId)
         {
-            throw new NotImplementedException();
+            var courses = await _unitOfWork.Courses.GetCoursesByInstructorAsync(InstructorId);
+            var result = _mapper.Map<List<CourseReponseDto>>(courses);
+            return result;
         }
 
-        public async Task<Course> GetSingleCourseByIdAsync(Guid CourseId)
+        public async Task<CourseReponseDto> GetSingleCourseByIdAsync(Guid CourseId)
         {
             var course = await _unitOfWork.Courses.GetSingleCourseByIdAsync(CourseId);
-            return course;
+            var result = _mapper.Map<CourseReponseDto>(course);
+            return result;
         }
 
         public async Task<ApplicationUser> GetUserInfo(string UserId)

@@ -5,11 +5,11 @@ namespace CourseManagement.Services.Interfaces
 {
     public interface ICourseService
     {
-        Task<Course> AddCourseAsync(CourseRequestDto courseRequestDto, string InstructorId);
+        Task<Guid> AddCourseAsync(CourseRequestDto courseRequestDto, string InstructorId);
         Task EditCourseAsync(Guid CourseId, string InstructorId, CourseRequestDto courseRequestDto);
         Task DeleteCourseAsync(Guid CourseId, string InstructorId);
-        Task GetCoursesByInstructorAsync(string InstructorId);
-        Task GetAllCoursesAsync();
-        Task<Course> GetSingleCourseByIdAsync(Guid CourseId);
+        Task<List<CourseReponseDto>> GetCoursesByInstructorAsync(string InstructorId);
+        Task<List<CourseReponseDto>> GetAllCoursesAsync();
+        Task<CourseReponseDto> GetSingleCourseByIdAsync(Guid CourseId);
     }
 }

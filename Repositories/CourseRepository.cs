@@ -18,7 +18,17 @@ namespace CourseManagement.Repositories
         public async Task<Course> GetSingleCourseByIdAsync(Guid accountId)
         {
             return await _dbContext.Courses.Where(a => a.Id == accountId).Include("Instructor").FirstOrDefaultAsync() ?? 
-                throw new NotFoundException("Course not found.");;
+                throw new NotFoundException("Course not found.");
+        }
+
+        public async Task<List<Course>> GetAllCoursesAsync()
+        {
+            return await _dbContext.Courses.Include("Instructor").ToListAsync();
+        }
+
+        public async Task<List<Course>> GetCoursesByInstructorAsync(string InstructorId)
+        {
+            return await _dbContext.Courses.Where(a => a.InstructorId == InstructorId).Include("Instructor").ToListAsync();
         }
     }
 }
