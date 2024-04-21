@@ -11,7 +11,7 @@ namespace CourseManagement.Config
 		{
             CreateMap<ApplicationUser, UserDto>().ReverseMap();
             CreateMap<ApplicationUser, UserAuthResponseDto>().ReverseMap();
-            CreateMap<EditCourseRequestDto, Course>().ReverseMap();;
+            CreateMap<CourseRequestDto, Course>().ReverseMap();;
         }
     }
 }

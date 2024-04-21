@@ -25,15 +25,16 @@ namespace CourseManagement.Services
             _mapper = mapper;
         }
 
-        public async Task<Course> AddCourseAsync(AddCourseRequestDto addCourseRequestDto, string InstructorId)
+        public async Task<Course> AddCourseAsync(CourseRequestDto courseRequestDto, string InstructorId)
         {
+            await ValidateCourseRequestAsync(courseRequestDto);
             var course = new Course
             {
-                CourseName = addCourseRequestDto.CourseName,
-                Description = addCourseRequestDto.Description,
+                CourseName = courseRequestDto.CourseName,
+                Description = courseRequestDto.Description,
                 InstructorId = InstructorId,
-                StartDate = addCourseRequestDto.StartDate,
-                EndDate = addCourseRequestDto.EndDate,
+                StartDate = courseRequestDto.StartDate,
+                EndDate = courseRequestDto.EndDate
             };
 
             await _unitOfWork.Courses.Add(course);
@@ -52,15 +53,21 @@ namespace CourseManagement.Services
             await _unitOfWork.CommitAsync();
         }
 
-        public async Task EditCourseAsync(Guid CourseId, string InstructorId, EditCourseRequestDto editCourseRequestDto)
+        public async Task EditCourseAsync(Guid CourseId, string InstructorId, CourseRequestDto courseRequestDto)
         {
+            await ValidateCourseRequestAsync(courseRequestDto);
             var course = await _unitOfWork.Courses.GetByIdAsync(CourseId);
             if(course.InstructorId != InstructorId)
                 throw new UnauthorizedAccessException("You are not authorized to edit this course");
 
-            _mapper.Map(editCourseRequestDto, course);
+            _mapper.Map(courseRequestDto, course);
             _unitOfWork.Courses.Update(course);
             await _unitOfWork.CommitAsync();
+        }
+
+        public Task GetAllCoursesAsync()
+        {
+            throw new NotImplementedException();
         }
 
         public Task GetCoursesByInstructorAsync(string InstructorId)
@@ -78,6 +85,22 @@ namespace CourseManagement.Services
         {
             var user = await _userManager.FindByIdAsync(UserId) ?? throw new NotFoundException("User Not Found");
             return user;
+        }
+        public async Task<bool> ValidateCourseRequestAsync(CourseRequestDto courseRequestDto)
+        {
+            var validator = new CourseRequestDtoValidator();
+            var validationResult = await validator.ValidateAsync(courseRequestDto);
+
+            if (!validationResult.IsValid)
+            {
+                var errors = validationResult.Errors
+                    .Select(err => err.ErrorMessage)
+                    .Aggregate((allErrors, nextError) => $"{allErrors}\n- {nextError}");
+
+                throw new BadRequestException(errors);
+            }
+
+            return true;
         }
     }
 }

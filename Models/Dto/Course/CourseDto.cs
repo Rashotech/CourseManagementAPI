@@ -1,11 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 
-
 namespace CourseManagement.Models.Dto.Course
 {
-    public class AddCourseRequestDto
+    public class CourseDto
     {
-        [Required]
+       [Required]
         public required string CourseName { get; set; }
 
         [Required]
@@ -13,10 +12,10 @@ namespace CourseManagement.Models.Dto.Course
 
         [Required]
         [DataType(DataType.Date)]
-        public DateTime StartDate { get; set; }
+        public required DateTime StartDate { get; set; }
 
         [Required]
         [DataType(DataType.Date)]
-        public DateTime EndDate { get; set; }
+        public required DateTime EndDate { get; set; }
     }
 }

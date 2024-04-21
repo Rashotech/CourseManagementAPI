@@ -25,10 +25,10 @@ namespace CourseManagement.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<ActionResult<APIResponse<Course>>> AddCourse([FromBody] AddCourseRequestDto addCourseRequestDto)
+        public async Task<ActionResult<APIResponse<Course>>> AddCourse([FromBody] CourseRequestDto courseRequestDto)
         {
             var InstructorId = GetLoggedInUserID();
-            var course = await _courseService.AddCourseAsync(addCourseRequestDto, InstructorId);
+            var course = await _courseService.AddCourseAsync(courseRequestDto, InstructorId);
             return CreatedAtAction(nameof(GetSingleCourseById), new { Id = course.Id }, new APIResponse<Course>
             {
                 StatusCode = HttpStatusCode.Created,
@@ -50,10 +50,10 @@ namespace CourseManagement.Controllers
         [Authorize(Roles = Roles.Administrator)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<APIResponse<Course>>> EditCourseById(Guid id, [FromBody] EditCourseRequestDto editCourseRequestDto)
+        public async Task<ActionResult<APIResponse<Course>>> EditCourseById(Guid id, [FromBody] CourseRequestDto courseRequestDto)
         {
             var InstructorId = GetLoggedInUserID();
-            await _courseService.EditCourseAsync(id, InstructorId, editCourseRequestDto);
+            await _courseService.EditCourseAsync(id, InstructorId, courseRequestDto);
             return NoContent();
         }
 
