@@ -47,7 +47,7 @@ namespace CourseManagement.Services
             };
         }
 
-        public async Task<UserAuthResponseDto> RegisterAsync(RegisterUserRequestDto registerUserDto)
+        public async Task<UserAuthResponseDto> RegisterAsync(RegisterUserRequestDto registerUserDto, bool isAdmin = false)
         {
             // Check if username is already taken
             var existingUser = await _userManager.FindByNameAsync(registerUserDto.UserName);
@@ -73,7 +73,7 @@ namespace CourseManagement.Services
                 throw new BadRequestException("Unable to Register User. " + errorMessage);
             }
 
-            var role = Roles.RegularUser;
+            var role = isAdmin ? Roles.Administrator : Roles.RegularUser;
             await _userManager.AddToRoleAsync(user, role);
             return new UserAuthResponseDto()
             {

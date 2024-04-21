@@ -20,11 +20,13 @@ namespace CourseManagement.Controllers
         }
 
         [HttpPost("register")]
+        [HttpPost("register/admin")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<APIResponse<UserAuthResponseDto>>> Register([FromBody] RegisterUserRequestDto registerUserRequestDto)
         {
-            var user = await _authService.RegisterAsync(registerUserRequestDto);
+            bool isAdmin = ControllerContext?.ActionDescriptor?.AttributeRouteInfo?.Template?.Contains("admin") ?? false;
+            var user = await _authService.RegisterAsync(registerUserRequestDto, isAdmin);
             return CreatedAtAction(nameof(Login), null, new APIResponse<UserAuthResponseDto>
             {
                 StatusCode = HttpStatusCode.Created,
