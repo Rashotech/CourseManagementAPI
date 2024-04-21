@@ -3,6 +3,8 @@ using CourseManagement.Config;
 using CourseManagement.Database;
 using CourseManagement.Database.Models;
 using CourseManagement.Helpers;
+using CourseManagement.Repositories;
+using CourseManagement.Repositories.Interfaces;
 using CourseManagement.Services;
 using CourseManagement.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -43,6 +45,8 @@ builder.Services.AddAuthentication(options =>
     options.RequireHttpsMetadata = false;
     options.TokenValidationParameters = new TokenValidationParameters()
     {
+        ValidateIssuer = false,
+        ValidateAudience = false,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret))
@@ -54,12 +58,14 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options
     .UseSqlServer(connectionString)
     .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
 );
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddIdentityCore<ApplicationUser>()
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ICourseService, CourseService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

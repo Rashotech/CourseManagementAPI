@@ -2,7 +2,7 @@ namespace CourseManagement.Models
 {
     public static class Roles
     {
-        public static readonly string Administrator = "Administrator";
-        public static readonly string RegularUser = "Regular User";
+        public const string Administrator = "Administrator";
+        public const string RegularUser = "Regular User";
     }
 }

@@ -1,6 +1,7 @@
 using AutoMapper;
 using CourseManagement.Database.Models;
 using CourseManagement.Models.Dto;
+using CourseManagement.Models.Dto.Course;
 
 namespace CourseManagement.Config
 {
@@ -10,6 +11,8 @@ namespace CourseManagement.Config
 		{
             CreateMap<ApplicationUser, UserDto>().ReverseMap();
             CreateMap<ApplicationUser, UserAuthResponseDto>().ReverseMap();
+            CreateMap<CourseRequestDto, Course>().ReverseMap();
+            CreateMap<CourseReponseDto, Course>().ReverseMap();
         }
     }
 }
