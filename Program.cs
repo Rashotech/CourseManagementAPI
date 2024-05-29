@@ -7,11 +7,14 @@ using CourseManagement.Repositories;
 using CourseManagement.Repositories.Interfaces;
 using CourseManagement.Services;
 using CourseManagement.Services.Interfaces;
+using Lib.AspNetCore.ServerSentEvents;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +30,9 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod();
         });
 });
+
+builder.Host.UseSerilog((context, loggerConfig) =>
+    loggerConfig.ReadFrom.Configuration(context.Configuration));
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
@@ -67,6 +73,18 @@ builder.Services.AddIdentityCore<ApplicationUser>()
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
 
+builder.Services.AddServerSentEvents();
+builder.Services.AddServerSentEvents<INotificationsServerSentEventsService, NotificationsServerSentEventsService>(options =>
+{
+    options.KeepaliveMode = ServerSentEventsKeepaliveMode.Always;
+    options.KeepaliveInterval = 15;
+});
+
+builder.Services.AddResponseCompression(options =>
+{
+    options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "text/event-stream" });
+});
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(opt =>
@@ -100,11 +118,11 @@ builder.Services.AddSwaggerGen(opt =>
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    await Seeder.InitializeAsync(services);
-}
+// using (var scope = app.Services.CreateScope())
+// {
+//     var services = scope.ServiceProvider;
+//     await Seeder.InitializeAsync(services);
+// }
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -112,6 +130,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors();
+
+app.UseMiddleware<RequestContextLoggingMiddleware>();
+app.MapServerSentEvents("/default-sse-endpoint");
+app.MapServerSentEvents<NotificationsServerSentEventsService>("/notifications-sse-endpoint");
+
+app.UseSerilogRequestLogging();
 
 app.UseExceptionHandler()
    .UseAuthentication()

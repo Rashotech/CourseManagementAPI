@@ -3,6 +3,7 @@ using System.Security.Claims;
 using CourseManagement.Models;
 using CourseManagement.Models.Dto.Course;
 using CourseManagement.Services.Interfaces;
+using Lib.AspNetCore.ServerSentEvents;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,10 +14,13 @@ namespace CourseManagement.Controllers
     public class CourseController: ControllerBase
     {
         private readonly ICourseService _courseService;
+        private readonly IServerSentEventsService _serverSentEventsService;
+        private const string HEARTBEAT_MESSAGE_FORMAT = "Demo.AspNetCore.ServerSentEvents Heartbeat ({0} UTC)";
 
-        public CourseController(ICourseService courseService)
+        public CourseController(ICourseService courseService, IServerSentEventsService serverSentEventsService)
         {
             _courseService = courseService;
+            _serverSentEventsService = serverSentEventsService;
         }
 
         [HttpPost]
@@ -45,7 +49,25 @@ namespace CourseManagement.Controllers
             return Ok(new APIResponse<List<CourseReponseDto>> { Data = courses, Message = "All Courses Fetched Successfully" });
         }
 
-        [HttpGet("instructors/{id}")]
+        [HttpGet("send-heartbeat")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<APIResponseBase>> SendHeartBeat()
+        {
+            var notification = "Heartbeat sent successfully";
+            await _serverSentEventsService.SendEventAsync(new ServerSentEvent
+            {
+                Type ="alert",
+                Data = new List<string>(notification.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None))
+            });
+
+            await _serverSentEventsService.SendEventAsync(String.Format(HEARTBEAT_MESSAGE_FORMAT, DateTime.UtcNow));
+
+            var clients = _serverSentEventsService.GetClients();
+
+            return Ok(new APIResponseBase {  Message = "Notification sent Successfully", Data = clients.Count() });
+        }
+
+        [HttpGet("instructors/{id}")] 
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<APIResponse<List<CourseReponseDto>>>> GetCoursesByInstructor(string id)
